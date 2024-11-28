@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User{
+  id String @id @default(uuid())
+  user_name String
+  email String
+  password String
+  is_super_admin Boolean @default(false)
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt 
+}
+
+model Program {
+  id String @id @default(uuid())
+  name String
+  target_nominal Int
+  target_date_donation DateTime?
+  is_not_target_donaion Boolean @default(false)
+  description String?
+  thumbnail Img @relation(fields: [thumbnail_img_id], references: [id])
+  thumbnail_img_id String @unique
+
+  donation Donation[]
+  news News[]
+
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt 
+}
+
+model Donation {
+  id String @id @default(uuid())
+  user_name String
+  phone String?
+  message String?
+  donation Int
+  program Program @relation(fields: [program_id], references: [id])
+  program_id String 
+
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt 
+}
+
+model News{
+  id String @id @default(uuid())
+  date DateTime?
+  description String
+  thumbnail Img @relation(fields: [thumbnail_img_id], references: [id])
+  thumbnail_img_id String @unique
+  program Program? @relation(fields: [program_id], references: [id])
+  program_id String?
+
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt 
+}
+
+model Img {
+  id String @id @default(uuid())
+  url String
+  program Program?
+  news News?
+}
