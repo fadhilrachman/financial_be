@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-export const postLogin = async ({ req, res }) => {
+const postLogin = async ({ req, res }) => {
   const { password, email } = req.body;
   try {
     const checkCredenttial = await prisma.user.findUnique({
@@ -35,4 +35,8 @@ export const postLogin = async ({ req, res }) => {
     console.log({ error });
     return res.status(500).json({ error: error.message || "Server error" });
   }
+};
+
+module.exports = {
+  postLogin,
 };

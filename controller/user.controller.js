@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-export const postUser = async ({ req, res }) => {
+const postUser = async ({ req, res }) => {
   const { user_name, email, password, is_super_admin = false } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, process.env.SALT_ROUND);
@@ -23,7 +23,7 @@ export const postUser = async ({ req, res }) => {
   }
 };
 
-export const deleteUser = async ({ res, user_id }) => {
+const deleteUser = async ({ res, user_id }) => {
   try {
     const result = await prisma.user.delete({
       where: {
@@ -36,8 +36,8 @@ export const deleteUser = async ({ res, user_id }) => {
     return res.status(500).json({ error: error.message || "Server error" });
   }
 };
-export const getUser = async ({ req, res }) => {
-  const { page = 1, per_page = 10 } = req.queryParams;
+const getUser = async ({ req, res }) => {
+  const { page = 1, per_page = 10 } = req.query;
   const skip = (page - 1) * per_page;
 
   try {
@@ -45,7 +45,7 @@ export const getUser = async ({ req, res }) => {
     const pagination = createPagination({ page, per_page, total_data: count });
     const result = await prisma.user.findMany({
       skip,
-      take: per_page,
+      take: Number(per_page),
     });
 
     return res
@@ -55,4 +55,9 @@ export const getUser = async ({ req, res }) => {
     console.log({ error });
     return res.status(500).json({ error: error.message || "Server error" });
   }
+};
+module.exports = {
+  getUser,
+  postUser,
+  deleteUser,
 };

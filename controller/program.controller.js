@@ -3,7 +3,7 @@ const { createPagination } = require("../lib/pagination");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-export const postProgram = async ({ req, res }) => {
+const postProgram = async ({ req, res }) => {
   const {
     name,
     thumbnail_img_id,
@@ -30,7 +30,7 @@ export const postProgram = async ({ req, res }) => {
   }
 };
 
-export const putProgram = async ({ req, res, program_id }) => {
+const putProgram = async ({ req, res, program_id }) => {
   const {
     name,
     thumbnail_img_id,
@@ -60,7 +60,7 @@ export const putProgram = async ({ req, res, program_id }) => {
   }
 };
 
-export const deleteProgram = async ({ res, program_id }) => {
+const deleteProgram = async ({ res, program_id }) => {
   try {
     const result = await prisma.program.update({
       data: {
@@ -76,8 +76,8 @@ export const deleteProgram = async ({ res, program_id }) => {
     return res.status(500).json({ error: error.message || "Server error" });
   }
 };
-export const getProgram = async ({ res, res }) => {
-  const { page = 1, per_page = 10, program_id } = req.queryParams;
+const getProgram = async ({ req, res }) => {
+  const { page = 1, per_page = 10, program_id } = req.query;
   const skip = (page - 1) * per_page;
 
   try {
@@ -85,7 +85,7 @@ export const getProgram = async ({ res, res }) => {
     const pagination = createPagination({ page, per_page, total_data: count });
     const result = await prisma.program.findMany({
       skip,
-      take: per_page,
+      take: Number(per_page),
     });
 
     return res
@@ -95,4 +95,11 @@ export const getProgram = async ({ res, res }) => {
     console.log({ error });
     return res.status(500).json({ error: error.message || "Server error" });
   }
+};
+
+module.exports = {
+  getProgram,
+  postProgram,
+  putProgram,
+  deleteProgram,
 };

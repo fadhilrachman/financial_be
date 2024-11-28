@@ -3,7 +3,7 @@ const { createPagination } = require("../lib/pagination");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-export const postDonation = async ({ req, res, program_id }) => {
+const postDonation = async ({ req, res, program_id }) => {
   const { user_name, phone, message, is_hide_name } = req.body;
   try {
     const payload = {
@@ -21,8 +21,8 @@ export const postDonation = async ({ req, res, program_id }) => {
   }
 };
 
-export const getDonation = async ({ res, res }) => {
-  const { page = 1, per_page = 10, program_id } = req.queryParams;
+const getDonation = async ({ req, res }) => {
+  const { page = 1, per_page = 10, program_id } = req.query;
   const skip = (page - 1) * per_page;
 
   try {
@@ -30,7 +30,7 @@ export const getDonation = async ({ res, res }) => {
     const pagination = createPagination({ page, per_page, total_data: count });
     const result = await prisma.donation.findMany({
       skip,
-      take: per_page,
+      take: Number(per_page),
       where: {
         program_id,
       },
@@ -43,4 +43,9 @@ export const getDonation = async ({ res, res }) => {
     console.log({ error });
     return res.status(500).json({ error: error.message || "Server error" });
   }
+};
+
+module.exports = {
+  getDonation,
+  postDonation,
 };
