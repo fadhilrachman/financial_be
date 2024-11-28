@@ -17,7 +17,7 @@ datasource db {
 model User{
   id String @id @default(uuid())
   user_name String
-  email String
+  email String @unique
   password String
   is_super_admin Boolean @default(false)
   created_at DateTime @default(now())
@@ -36,7 +36,8 @@ model Program {
 
   donation Donation[]
   news News[]
-
+  
+  deleted_at DateTime?
   created_at DateTime @default(now())
   update_at DateTime @updatedAt 
 }
