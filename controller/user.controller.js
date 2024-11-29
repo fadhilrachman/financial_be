@@ -6,7 +6,12 @@ const prisma = new PrismaClient();
 const postUser = async ({ req, res }) => {
   const { user_name, email, password, is_super_admin = false } = req.body;
   try {
-    const hashedPassword = await bcrypt.hash(password, process.env.SALT_ROUND);
+    const checkDuplicateEmail = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (checkDuplicateEmail)
+      return res.status(400).json({ message: "Email sudah dipakai" });
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await prisma.user.create({
       data: {
@@ -46,6 +51,12 @@ const getUser = async ({ req, res }) => {
     const result = await prisma.user.findMany({
       skip,
       take: Number(per_page),
+      select: {
+        id: true,
+        user_name: true,
+        email: true,
+        is_super_admin: true,
+      },
     });
 
     return res
@@ -56,8 +67,30 @@ const getUser = async ({ req, res }) => {
     return res.status(500).json({ error: error.message || "Server error" });
   }
 };
+
+const getUserDetail = async ({ req, res, user_id }) => {
+  try {
+    const result = await prisma.user.findUnique({
+      where: {
+        id: user_id,
+      },
+      select: {
+        id: true,
+        user_name: true,
+        email: true,
+        is_super_admin: true,
+      },
+    });
+
+    return res.status(200).json({ message: "Success get user", result });
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).json({ error: error.message || "Server error" });
+  }
+};
 module.exports = {
   getUser,
   postUser,
   deleteUser,
+  getUserDetail,
 };

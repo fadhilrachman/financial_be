@@ -9,14 +9,22 @@ const usersRouter = require("./router/user.router");
 const donationRouter = require("./router/donation.router");
 const programRouter = require("./router/program.router");
 const newsRouter = require("./router/news.router");
-
+const imgRouter = require("./router/img.router");
+const cors = require("cors");
 const app = express();
 const prisma = new PrismaClient();
+const AWS = require("aws-sdk");
+require("dotenv").config();
 
 process.on("SIGINT", async () => {
   await prisma.$disconnect();
   process.exit(0);
 });
+// AWS.config.update({
+//   accessKeyId: process.env.AWS_ACCESS_KEY_ID, // Access Key Anda
+//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, // Secret Key Anda
+//   region: "ap-south-1",
+// });
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
@@ -27,11 +35,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use(cors());
 app.use(auth);
 app.use(usersRouter);
 app.use(donationRouter);
 app.use(programRouter);
 app.use(newsRouter);
+app.use(imgRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
