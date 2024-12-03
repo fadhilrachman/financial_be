@@ -86,11 +86,99 @@ const getProgram = async ({ req, res }) => {
     const result = await prisma.program.findMany({
       skip,
       take: Number(per_page),
+      include: {
+        thumbnail: true,
+        donation: {
+          select: {
+            donation: true,
+          },
+        },
+      },
     });
+
+    const finallyResult = result.map((val) => {
+      const {
+        id,
+        name,
+        target_nominal,
+        thumbnail,
+        description,
+        is_not_target_donaion,
+        target_date_donation,
+        donation,
+      } = val;
+      let totalDonation = 0;
+
+      donation.forEach((val) => {
+        totalDonation += val.donation;
+      });
+
+      return {
+        id,
+        name,
+        target_nominal,
+        thumbnail,
+        description,
+        is_not_target_donaion,
+        target_date_donation,
+        total_donation: totalDonation,
+      };
+    });
+
+    return res.status(200).json({
+      message: "Success get donation",
+      result: finallyResult,
+      pagination,
+    });
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).json({ error: error.message || "Server error" });
+  }
+};
+
+const getProgramDetail = async ({ req, res, program_id }) => {
+  try {
+    const result = await prisma.program.findUnique({
+      where: {
+        id: program_id,
+      },
+      include: {
+        thumbnail: true,
+        donation: true,
+      },
+    });
+
+    const {
+      id,
+      name,
+      target_nominal,
+      thumbnail,
+      description,
+      is_not_target_donaion,
+      target_date_donation,
+      donation,
+    } = result;
+    let totalDonation = 0;
+
+    donation.forEach((val) => {
+      totalDonation += val.donation;
+    });
+
+    const finallyResult = {
+      id,
+      name,
+      target_nominal,
+      thumbnail,
+      description,
+      is_not_target_donaion,
+      target_date_donation,
+      donation,
+      total_donation: totalDonation,
+    };
 
     return res
       .status(200)
-      .json({ message: "Success get donation", result, pagination });
+      .json({ message: "Success get donation", result: finallyResult });
   } catch (error) {
     console.log({ error });
     return res.status(500).json({ error: error.message || "Server error" });
@@ -98,6 +186,7 @@ const getProgram = async ({ req, res }) => {
 };
 
 module.exports = {
+  getProgramDetail,
   getProgram,
   postProgram,
   putProgram,

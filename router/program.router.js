@@ -5,10 +5,15 @@ const {
   deleteProgram,
   getProgram,
   putProgram,
+  getProgramDetail,
 } = require("../controller/program.controller");
 
 router.get("/api/program", function (req, res, next) {
   return getProgram({ req, res });
+});
+
+router.get("/api/program/:program_id", function (req, res, next) {
+  return getProgramDetail({ req, res, program_id: req.params.program_id });
 });
 
 router.post("/api/program", function (req, res, next) {

@@ -4,13 +4,14 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const postDonation = async ({ req, res, program_id }) => {
-  const { user_name, phone, message, is_hide_name } = req.body;
+  const { user_name, phone, message, is_hide_name, donation } = req.body;
   try {
     const payload = {
       user_name: is_hide_name ? "Seseorang" : user_name,
       phone,
       message,
       program_id,
+      donation,
     };
 
     const result = await prisma.donation.create({ data: payload });

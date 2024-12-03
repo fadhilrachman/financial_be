@@ -42,32 +42,44 @@ const putNews = async ({ req, res, news_id }) => {
   }
 };
 
-const deleteNews = async ({ res, program_id }) => {
+const deleteNews = async ({ res, news_id }) => {
   try {
+    console.log({ news_id });
+
     const result = await prisma.news.delete({
-      data: {
-        deleted_at: new Date(),
-      },
       where: {
-        id: program_id,
+        id: news_id,
       },
     });
     return res.status(201).json({ message: "Berhasil buat news", result });
   } catch (error) {
     console.log({ error });
-    return res.status(500).json({ error: error.message || "Server error" });
+    return res.status(500).json({ message: error.message || "Server error" });
   }
 };
 const getNews = async ({ req, res }) => {
-  const { page = 1, per_page = 10 } = req.query;
+  const { page = 1, per_page = 10, program_id } = req.query;
   const skip = (page - 1) * per_page;
+  let filter = {};
 
+  if (program_id) filter.program_id = program_id;
   try {
-    const count = await prisma.news.count();
+    const count = await prisma.news.count({ where: filter });
     const pagination = createPagination({ page, per_page, total_data: count });
     const result = await prisma.news.findMany({
       skip,
       take: Number(per_page),
+      orderBy: {
+        date: "desc",
+      },
+      where: filter,
+      select: {
+        id: true,
+        date: true,
+        description: true,
+        thumbnail: true,
+        program_id: true,
+      },
     });
 
     return res

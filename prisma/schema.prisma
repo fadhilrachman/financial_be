@@ -27,10 +27,10 @@ model User{
 model Program {
   id String @id @default(uuid())
   name String
-  target_nominal Int
+  target_nominal Int?
   target_date_donation DateTime?
   is_not_target_donaion Boolean @default(false)
-  description String?
+  description String? @db.Text
   thumbnail Img @relation(fields: [thumbnail_img_id], references: [id])
   thumbnail_img_id String @unique
 
@@ -58,7 +58,7 @@ model Donation {
 model News{
   id String @id @default(uuid())
   date DateTime?
-  description String
+  description String @db.Text
   thumbnail Img @relation(fields: [thumbnail_img_id], references: [id])
   thumbnail_img_id String @unique
   program Program? @relation(fields: [program_id], references: [id])
