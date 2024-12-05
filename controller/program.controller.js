@@ -11,16 +11,28 @@ const postProgram = async ({ req, res }) => {
     target_date_donation,
     is_not_target_donaion,
     description,
+    is_not_target_date_donation,
   } = req.body;
+  console.log({
+    name,
+    thumbnail_img_id,
+    target_nominal,
+    target_date_donation,
+    is_not_target_donaion,
+    description,
+    is_not_target_date_donation,
+  });
+
   try {
     const result = await prisma.program.create({
       data: {
         name,
         thumbnail_img_id,
-        target_nominal,
+        target_nominal: Number(target_nominal),
         target_date_donation,
         is_not_target_donaion,
         description,
+        is_not_target_date_donation,
       },
     });
     return res.status(201).json({ message: "Berhasil buat program", result });

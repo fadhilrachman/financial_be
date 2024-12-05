@@ -32,6 +32,7 @@ const getDonation = async ({ req, res }) => {
     const result = await prisma.donation.findMany({
       skip,
       take: Number(per_page),
+      orderBy: { created_at: "desc" },
       where: {
         program_id,
       },

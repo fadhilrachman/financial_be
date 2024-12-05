@@ -30,6 +30,7 @@ model Program {
   target_nominal Int?
   target_date_donation DateTime?
   is_not_target_donaion Boolean @default(false)
+  is_not_target_date_donation Boolean @default(false)
   description String? @db.Text
   thumbnail Img @relation(fields: [thumbnail_img_id], references: [id])
   thumbnail_img_id String @unique
