@@ -1,10 +1,24 @@
 const { createPagination } = require("../lib/pagination");
 
+require("dotenv").config();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const Midtrans = require("midtrans-client");
 
+const snap = new Midtrans.Snap({
+  serverKey: "SB-Mid-server-lsZOhr116-vSzAtP7EIKOXwJ",
+  clientKey: "SB-Mid-client-czgI8ZHcPpqKvGVY",
+  isProduction: false,
+});
 const postDonation = async ({ req, res, program_id }) => {
   const { user_name, phone, message, is_hide_name, donation } = req.body;
+  let parameterMidtrans = {
+    transaction_details: {
+      order_id: "test-transaction-6",
+      gross_amount: donation,
+    },
+  };
+
   try {
     const payload = {
       user_name: is_hide_name ? "Seseorang" : user_name,
@@ -14,8 +28,9 @@ const postDonation = async ({ req, res, program_id }) => {
       donation,
     };
 
-    const result = await prisma.donation.create({ data: payload });
-    return res.status(201).json({ message: "Berhasil kirim donasi", result });
+    const token = await snap.createTransactionToken(parameterMidtrans);
+    // const result = await prisma.donation.create({ data: payload });
+    return res.status(201).json({ message: "Berhasil kirim donasi", token });
   } catch (error) {
     console.log({ error });
     return res.status(500).json({ error: error.message || "Server error" });

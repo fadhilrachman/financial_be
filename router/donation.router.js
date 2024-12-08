@@ -6,16 +6,12 @@ const {
 } = require("../controller/donation.controller");
 const verifyToken = require("../lib/middleware-token");
 
-router.get("/api/donation/", verifyToken, function (req, res, next) {
+router.get("/api/donation/", function (req, res, next) {
   return getDonation({ req, res });
 });
 
-router.post(
-  "/api/donation/:program_id",
-  verifyToken,
-  function (req, res, next) {
-    return postDonation({ req, res, program_id: req.params.program_id });
-  }
-);
+router.post("/api/donation/:program_id", function (req, res, next) {
+  return postDonation({ req, res, program_id: req.params.program_id });
+});
 
 module.exports = router;
