@@ -5,7 +5,6 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const { PrismaClient } = require("@prisma/client");
 const authRouter = require("./router/auth.router");
-const usersRouter = require("./router/user.router");
 const wishlistRouter = require("./router/wishlist.router");
 const categoryRouter = require("./router/category.router");
 const walletRouter = require("./router/wallet.router");

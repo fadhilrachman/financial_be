@@ -4,13 +4,18 @@ const {
   getWishlistTransaction,
   postWishlistTransaction,
 } = require("../controller/wishlist-transaction.controller");
+const verifyToken = require("../lib/middleware-token");
 
-router.get("/api/wishlist", function (req, res, next) {
-  return getWishlist({ req, res });
+router.get("/api/wishlist-transaction", verifyToken, function (req, res, next) {
+  return getWishlistTransaction({ req, res });
 });
 
-router.post("/api/wishlist", function (req, res, next) {
-  return postWishlist({ req, res });
-});
+router.post(
+  "/api/wishlist-transaction",
+  verifyToken,
+  function (req, res, next) {
+    return postWishlistTransaction({ req, res });
+  }
+);
 
 module.exports = router;

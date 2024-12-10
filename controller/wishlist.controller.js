@@ -3,7 +3,7 @@ const { createPagination } = require("../lib/pagination");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-const postWishlist = async ({ req, res }) => {
+const postWishlist = async ({ req, res, user_id }) => {
   const { name, target_date, target_nominal } = req.body;
   try {
     const result = await prisma.wishlist.create({
@@ -11,6 +11,7 @@ const postWishlist = async ({ req, res }) => {
         target_date,
         target_nominal,
         name,
+        user_id,
       },
     });
     return res.status(201).json({ message: "Succes create wishlist", result });
@@ -20,7 +21,7 @@ const postWishlist = async ({ req, res }) => {
   }
 };
 
-const putWishlist = async ({ req, res, wishlist_id }) => {
+const putWishlist = async ({ req, res, wishlist_id, user_id }) => {
   const { name, target_date, target_nomina } = req.body;
   try {
     const result = await prisma.wishlist.update({
@@ -28,6 +29,7 @@ const putWishlist = async ({ req, res, wishlist_id }) => {
         name,
         target_date,
         target_nomina,
+        user_id,
       },
       where: {
         id: wishlist_id,
@@ -74,7 +76,7 @@ const getWishlistDetail = async ({ req, res, wishlist_id }) => {
     return res.status(500).json({ error: error.message || "Server error" });
   }
 };
-const getWishlist = async ({ req, res }) => {
+const getWishlist = async ({ req, res, user_id }) => {
   const { page = 1, per_page = 10, program_id } = req.query;
   const skip = (page - 1) * per_page;
 
@@ -86,6 +88,9 @@ const getWishlist = async ({ req, res }) => {
       take: Number(per_page),
       orderBy: {
         created_at: "desc",
+      },
+      where: {
+        user_id,
       },
       select: {
         id: true,

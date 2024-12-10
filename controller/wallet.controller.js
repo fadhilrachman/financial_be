@@ -3,7 +3,7 @@ const { createPagination } = require("../lib/pagination");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-const postWallet = async ({ req, res }) => {
+const postWallet = async ({ req, res, user_id }) => {
   const { name, description, initial_balance } = req.body;
   try {
     const result = await prisma.wallet.create({
@@ -11,6 +11,7 @@ const postWallet = async ({ req, res }) => {
         name,
         description,
         initial_balance,
+        user_id,
       },
     });
     return res.status(201).json({ message: "Succes create wallet", result });
@@ -20,7 +21,7 @@ const postWallet = async ({ req, res }) => {
   }
 };
 
-const putWallet = async ({ req, res, wallet_id }) => {
+const putWallet = async ({ req, res, wallet_id, user_id }) => {
   const { name, description, initial_balance } = req.body;
   try {
     const result = await prisma.wallet.update({
@@ -67,21 +68,19 @@ const getWalletDetail = async ({ req, res, wallet_id }) => {
     return res.status(500).json({ error: error.message || "Server error" });
   }
 };
-const getWallet = async ({ req, res }) => {
+const getWallet = async ({ req, res, user_id }) => {
   const { page = 1, per_page = 10, program_id } = req.query;
   const skip = (page - 1) * per_page;
-  let filter = {};
+  let filter = {
+    user_id,
+  };
 
-  if (program_id) filter.program_id = program_id;
   try {
     const count = await prisma.wallet.count({ where: filter });
     const pagination = createPagination({ page, per_page, total_data: count });
     const result = await prisma.wallet.findMany({
       skip,
       take: Number(per_page),
-      orderBy: {
-        c: "desc",
-      },
       where: filter,
       select: {
         id: true,

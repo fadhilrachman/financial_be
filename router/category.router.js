@@ -7,7 +7,7 @@ const {
 } = require("../controller/category.controller");
 const verifyToken = require("../lib/middleware-token");
 
-router.get("/api/category", function (req, res, next) {
+router.get("/api/category", verifyToken, function (req, res, next) {
   return getCategory({ req, res });
 });
 

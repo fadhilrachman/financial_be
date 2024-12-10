@@ -90,10 +90,14 @@ const getTransactionDetail = async ({ req, res, transaction_id }) => {
     return res.status(500).json({ error: error.message || "Server error" });
   }
 };
-const getTransaction = async ({ req, res }) => {
+const getTransaction = async ({ req, res, user_id }) => {
   const { page = 1, per_page = 10, category_id, wallet_id } = req.query;
   const skip = (page - 1) * per_page;
-  let filter = {};
+  let filter = {
+    wallet: {
+      user_id,
+    },
+  };
 
   if (category_id) filter.category_id = category_id;
   if (wallet_id) filter.wallet_id = wallet_id;
