@@ -6,9 +6,9 @@ const logger = require("morgan");
 const { PrismaClient } = require("@prisma/client");
 const auth = require("./router/auth.router");
 const usersRouter = require("./router/user.router");
-const donationRouter = require("./router/donation.router");
-const programRouter = require("./router/program.router");
-const newsRouter = require("./router/news.router");
+const wishlistRouter = require("./router/wishlist.router");
+const categoryRouter = require("./router/category.router");
+const walletRouter = require("./router/wallet.router");
 const imgRouter = require("./router/img.router");
 const cors = require("cors");
 const app = express();
@@ -38,9 +38,9 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 app.use(auth);
 app.use(usersRouter);
-app.use(donationRouter);
-app.use(programRouter);
-app.use(newsRouter);
+app.use(wishlistRouter);
+app.use(categoryRouter);
+app.use(walletRouter);
 app.use(imgRouter);
 
 // catch 404 and forward to error handler
