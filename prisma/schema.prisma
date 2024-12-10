@@ -24,55 +24,56 @@ model User{
   update_at DateTime @updatedAt 
 }
 
-model Program {
+
+model Wallet{
   id String @id @default(uuid())
   name String
-  target_nominal Int?
-  target_date_donation DateTime?
-  is_not_target_donaion Boolean @default(false)
-  is_not_target_date_donation Boolean @default(false)
   description String? @db.Text
-  thumbnail Img @relation(fields: [thumbnail_img_id], references: [id])
-  thumbnail_img_id String @unique
+  transaction Transaction[]
+}
 
-  donation Donation[]
-  news News[]
-  
+model Category{
+  id String @id @default(uuid())
+  name String
+  transaction Transaction[]
+}
+
+model Transaction {
+  id String @id @default(uuid())
+  count Int
+  description String? @db.Text
+  type TypeTransaction
+
+  category_id String
+  category Category @relation(fields: [category_id], references: [id])
+
+  wallet_id String
+  wallet Wallet @relation(fields: [wallet_id], references: [id])
+
   deleted_at DateTime?
   created_at DateTime @default(now())
   update_at DateTime @updatedAt 
+
 }
 
-model Donation {
+model Wishlist {
   id String @id @default(uuid())
-  user_name String
-  phone String?
-  message String?
-  donation Int
-  program Program @relation(fields: [program_id], references: [id])
-  program_id String 
+  target_nominal Int
+  target_date DateTime
 
   created_at DateTime @default(now())
-  update_at DateTime @updatedAt 
+  update_at DateTime @updatedAt
 }
 
-model News{
+model WishlistTransaction{
   id String @id @default(uuid())
-  date DateTime?
-  description String @db.Text
-  thumbnail Img @relation(fields: [thumbnail_img_id], references: [id])
-  thumbnail_img_id String @unique
-  program Program? @relation(fields: [program_id], references: [id])
-  program_id String?
+  count Int
+  type TypeTransaction
+  description String? @db.Text
 
-  created_at DateTime @default(now())
-  update_at DateTime @updatedAt 
 }
 
-model Img {
-  id String @id @default(uuid())
-  name String
-  url String
-  program Program?
-  news News?
+enum TypeTransaction{
+  expense
+  income
 }
