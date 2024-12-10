@@ -37,6 +37,31 @@ const postLogin = async ({ req, res }) => {
   }
 };
 
+const postRegister = async ({ req, res }) => {
+  const { user_name, email, password, is_super_admin = false } = req.body;
+  try {
+    const checkDuplicateEmail = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (checkDuplicateEmail)
+      return res.status(400).json({ message: "Email sudah dipakai" });
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await prisma.user.create({
+      data: {
+        password: hashedPassword,
+        user_name,
+        email,
+        is_super_admin,
+      },
+    });
+    return res.status(201).json({ message: "Berhasil buat admin", result });
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).json({ error: error.message || "Server error" });
+  }
+};
 module.exports = {
   postLogin,
+  postRegister,
 };

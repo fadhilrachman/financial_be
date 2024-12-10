@@ -4,12 +4,12 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const { PrismaClient } = require("@prisma/client");
-const auth = require("./router/auth.router");
+const authRouter = require("./router/auth.router");
 const usersRouter = require("./router/user.router");
 const wishlistRouter = require("./router/wishlist.router");
 const categoryRouter = require("./router/category.router");
 const walletRouter = require("./router/wallet.router");
-const imgRouter = require("./router/img.router");
+const transactionRouter = require("./router/transaction.router");
 const cors = require("cors");
 const app = express();
 const prisma = new PrismaClient();
@@ -36,12 +36,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(cors());
-app.use(auth);
-app.use(usersRouter);
+app.use(authRouter);
 app.use(wishlistRouter);
 app.use(categoryRouter);
 app.use(walletRouter);
-app.use(imgRouter);
+app.use(transactionRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

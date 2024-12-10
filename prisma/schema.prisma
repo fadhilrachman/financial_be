@@ -22,6 +22,10 @@ model User{
   is_super_admin Boolean @default(false)
   created_at DateTime @default(now())
   update_at DateTime @updatedAt 
+
+  wallet Wallet[]
+  category Wishlist[]
+  wishlist Category[]
 }
 
 
@@ -30,12 +34,19 @@ model Wallet{
   name String
   initial_balance Int
   description String? @db.Text
+
+  user_id String
+  user User @relation(fields: [user_id], references: [id])
   transaction Transaction[]
+  wishlistTransaction WishlistTransaction[]
 }
 
 model Category{
   id String @id @default(uuid())
   name String
+
+  user_id String
+  user User @relation(fields: [user_id], references: [id])
   transaction Transaction[]
 }
 
@@ -61,6 +72,10 @@ model Wishlist {
   id String @id @default(uuid())
   target_nominal Int
   target_date DateTime
+  name String
+
+  user_id String
+  user User @relation(fields: [user_id], references: [id])
 
   created_at DateTime @default(now())
   update_at DateTime @updatedAt
@@ -70,8 +85,12 @@ model WishlistTransaction{
   id String @id @default(uuid())
   count Int
   type TypeTransaction
-  description String? @db.Text
+  wallet_id String
+  wallet Wallet @relation(fields: [wallet_id], references: [id])
 
+  description String? @db.Text
+  created_at DateTime @default(now())  
+  update_at DateTime @updatedAt
 }
 
 enum TypeTransaction{
