@@ -13,7 +13,7 @@ const postLogin = async ({ req, res }) => {
     });
 
     if (!checkCredenttial)
-      return res.status(401).json({ message: "Gagal login" });
+      return res.status(401).json({ message: "Login failed" });
 
     const checkPassword = await bcrypt.compare(
       password,

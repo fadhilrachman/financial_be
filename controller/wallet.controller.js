@@ -10,7 +10,7 @@ const postWallet = async ({ req, res, user_id }) => {
       data: {
         name,
         description,
-        initial_balance,
+        initial_balance: Number(initial_balance),
         user_id,
       },
     });
@@ -86,6 +86,7 @@ const getWallet = async ({ req, res, user_id }) => {
         id: true,
         name: true,
         description: true,
+        initial_balance: true,
       },
     });
 

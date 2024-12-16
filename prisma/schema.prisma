@@ -44,7 +44,8 @@ model Wallet{
 model Category{
   id String @id @default(uuid())
   name String
-
+  icon String?
+  type TypeTransaction
   user_id String
   user User @relation(fields: [user_id], references: [id])
   transaction Transaction[]
@@ -55,7 +56,7 @@ model Transaction {
   count Int
   description String? @db.Text
   type TypeTransaction
-
+  date DateTime
   category_id String
   category Category @relation(fields: [category_id], references: [id])
 

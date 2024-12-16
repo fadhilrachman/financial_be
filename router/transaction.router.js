@@ -6,11 +6,23 @@ const {
   putTransaction,
   getTransactionDetail,
   deleteTransaction,
+  getTransactionCount,
 } = require("../controller/transaction.controller");
 const verifyToken = require("../lib/middleware-token");
 
 router.get("/api/transaction", verifyToken, function (req, res, next) {
-  return getTransaction({ req, res });
+  return getTransaction({
+    req,
+    res,
+    user_id: req.user.id,
+  });
+});
+router.get("/api/transaction/count", verifyToken, function (req, res, next) {
+  return getTransactionCount({
+    req,
+    res,
+    user_id: req.user.id,
+  });
 });
 
 router.post("/api/transaction", verifyToken, function (req, res, next) {

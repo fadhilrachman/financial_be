@@ -2,17 +2,105 @@ const { createPagination } = require("../lib/pagination");
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const moment = require("moment");
+const getTransactionCount = async ({ req, res, user_id }) => {
+  try {
+    const { year, month, wallet_id } = req.query;
 
+    // Validasi input
+    if (!year || !month) {
+      return res.status(400).json({
+        message: "Tolong sertakan 'year' dan 'month' di query params.",
+      });
+    }
+
+    const yearInt = parseInt(year, 10);
+    const monthInt = parseInt(month, 10);
+
+    if (monthInt < 1 || monthInt > 12) {
+      return res.status(400).json({
+        message: "Bulan harus di antara 1 dan 12.",
+      });
+    }
+
+    const startOfMonth = moment(`${yearInt}-${monthInt}`, "YYYY-MM")
+      .startOf("month")
+      .toDate();
+    const endOfMonth = moment(startOfMonth).endOf("month").toDate();
+
+    const [incomeSum, expenseSum, incomeSumAll, expenseSumAll] =
+      await Promise.all([
+        prisma.transaction.aggregate({
+          _sum: {
+            count: true,
+          },
+          where: {
+            type: "income",
+            wallet_id,
+            date: {
+              gte: startOfMonth,
+              lte: endOfMonth,
+            },
+          },
+        }),
+        prisma.transaction.aggregate({
+          _sum: {
+            count: true,
+          },
+          where: {
+            type: "expense",
+            wallet_id,
+            date: {
+              gte: startOfMonth,
+              lte: endOfMonth,
+            },
+          },
+        }),
+        prisma.transaction.aggregate({
+          _sum: {
+            count: true,
+          },
+          where: {
+            type: "income",
+            wallet_id,
+          },
+        }),
+        prisma.transaction.aggregate({
+          _sum: {
+            count: true,
+          },
+          where: {
+            type: "expense",
+            wallet_id,
+          },
+        }),
+      ]);
+
+    // Response
+    return res.status(200).json({
+      result: {
+        income: incomeSum._sum.count || 0, // Default 0 jika tidak ada hasil
+        expense: expenseSum._sum.count || 0, // Default 0 jika tidak ada hasil
+        money_total:
+          expenseSumAll._sum.count || 0 - incomeSumAll._sum.count || 0,
+      },
+    });
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).json({ error: error.message || "Server error" });
+  }
+};
 const postTransaction = async ({ req, res }) => {
-  const { count, type, category_id, wallet_id, description } = req.body;
+  const { count, type, category_id, date, description, wallet_id } = req.body;
   try {
     const result = await prisma.transaction.create({
       data: {
-        count,
+        count: Number(count),
         type,
         category_id,
-        wallet_id,
+        date,
         description,
+        wallet_id,
       },
     });
     return res.status(201).json({ message: `Succes record ${type}`, result });
@@ -23,14 +111,14 @@ const postTransaction = async ({ req, res }) => {
 };
 
 const putTransaction = async ({ req, res, transaction_id }) => {
-  const { count, type, category_id, wallet_id, description } = req.body;
+  const { count, type, category_id, date, description } = req.body;
   try {
     const result = await prisma.transaction.update({
       data: {
-        count,
+        count: Number(count),
         type,
         category_id,
-        wallet_id,
+        date,
         description,
       },
       where: {
@@ -69,19 +157,25 @@ const getTransactionDetail = async ({ req, res, transaction_id }) => {
       select: {
         id: true,
         count: true,
+        date: true,
+        description: true,
+        type: true,
         category: {
           select: {
             id: true,
             name: true,
+            icon: true,
           },
         },
-        created_at: true,
         wallet: {
           select: {
             id: true,
             name: true,
           },
         },
+        // wallet_id: true,
+
+        created_at: true,
       },
     });
     return res.status(201).json({ message: "Succes get transaction", result });
@@ -108,16 +202,20 @@ const getTransaction = async ({ req, res, user_id }) => {
       skip,
       take: Number(per_page),
       orderBy: {
-        created_at: "desc",
+        date: "desc",
       },
       where: filter,
       select: {
         id: true,
         count: true,
+        date: true,
+        description: true,
+        type: true,
         category: {
           select: {
             id: true,
             name: true,
+            icon: true,
           },
         },
         wallet_id: true,
@@ -140,4 +238,5 @@ module.exports = {
   deleteTransaction,
   getTransactionDetail,
   getTransaction,
+  getTransactionCount,
 };

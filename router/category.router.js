@@ -8,11 +8,11 @@ const {
 const verifyToken = require("../lib/middleware-token");
 
 router.get("/api/category", verifyToken, function (req, res, next) {
-  return getCategory({ req, res });
+  return getCategory({ req, res, user_id: req.user.id });
 });
 
 router.post("/api/category", verifyToken, function (req, res, next) {
-  return postCategory({ req, res });
+  return postCategory({ req, res, user_id: req.user.id });
 });
 
 router.put(
