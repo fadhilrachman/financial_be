@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "build": "prisma generate",
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
