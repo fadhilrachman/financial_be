@@ -19,15 +19,10 @@ process.on("SIGINT", async () => {
   await prisma.$disconnect();
   process.exit(0);
 });
-// AWS.config.update({
-//   accessKeyId: process.env.AWS_ACCESS_KEY_ID, // Access Key Anda
-//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, // Secret Key Anda
-//   region: "ap-south-1",
-// });
-// view engine setup
-// app.set("views", path.join(__dirname, "views"));
-// app.set("view engine", "jade");
 
+app.listen(4000, () => {
+  console.log("nyambungggg");
+});
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
