@@ -12,7 +12,6 @@ const transactionRouter = require("./router/transaction.router");
 const cors = require("cors");
 const app = express();
 const prisma = new PrismaClient();
-const AWS = require("aws-sdk");
 require("dotenv").config();
 
 process.on("SIGINT", async () => {
